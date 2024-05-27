@@ -1,6 +1,0 @@
-Flask
-Flask-SQLAlchemy
-flask-cors
-Flask-Uploads
-werkzeug
-
