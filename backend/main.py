@@ -1,7 +1,12 @@
-from flask import request, jsonify
+from flask import Flask, request, jsonify, redirect, url_for, send_from_directory
+from werkzeug.utils import secure_filename
 from config import app, db
 from models import Item
+import os
 
+# Configurações para upload de arquivos
+app.config['UPLOAD_FOLDER'] = 'uploads'
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Limite de 16MB para upload de arquivos permitidos
 
 @app.route("/carros", methods=["GET"])
 def get_carros():
@@ -19,15 +24,32 @@ def create_car():
     """
     Cria um novo carro com os dados fornecidos.
     """
-    data = request.json
+    data = request.form
     required_fields = ["nome", "marca", "modelo", "preco"]
 
     for field in required_fields:
         if field not in data or not data[field]:
             return jsonify({"message": f"O campo {field} é obrigatório."}), 400
 
+    if 'foto' not in request.files:
+        return jsonify({"message": "O campo foto é obrigatório."}), 400
+
+    photo = request.files['foto']
+    if photo.filename == '':
+        return jsonify({"message": "Nenhuma foto selecionada."}), 400
+
+    filename = secure_filename(photo.filename)
+    photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+    photo_url = url_for('get_file', filename=filename, _external=True)
+
     try:
-        novo_carro = Item(**data)
+        novo_carro = Item(
+            nome=data['nome'],
+            marca=data['marca'],
+            modelo=data['modelo'],
+            preco=float(data['preco']),
+            foto=photo_url
+        )
         novo_carro.validate()
         db.session.add(novo_carro)
         db.session.commit()
@@ -49,7 +71,7 @@ def update_info(carro_id):
     if not carro:
         return jsonify({"message": "Carro não encontrado."}), 404
 
-    data = request.json
+    data = request.form
 
     try:
         if "preco" in data:
@@ -63,7 +85,13 @@ def update_info(carro_id):
     carro.nome = data.get("nome", carro.nome)
     carro.marca = data.get("marca", carro.marca)
     carro.modelo = data.get("modelo", carro.modelo)
-    carro.foto = data.get("foto", carro.foto)
+
+    if 'foto' in request.files:
+        photo = request.files['foto']
+        if photo.filename != '':
+            filename = secure_filename(photo.filename)
+            photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            carro.foto = url_for('get_file', filename=filename, _external=True)
 
     try:
         db.session.commit()
@@ -71,7 +99,6 @@ def update_info(carro_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": str(e)}), 500
-
 
 @app.route("/delete_carro/<int:carro_id>", methods=["DELETE"])
 def delete_carro(carro_id):
@@ -89,7 +116,15 @@ def delete_carro(carro_id):
     return jsonify({"message": "Carro deletado!"}), 200
 
 
+@app.route('/uploads/<filename>')
+def get_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+
 if __name__ == "__main__":
+    if not os.path.exists(app.config['UPLOAD_FOLDER']):
+        os.makedirs(app.config['UPLOAD_FOLDER'])
+
     with app.app_context():
         db.create_all()
 

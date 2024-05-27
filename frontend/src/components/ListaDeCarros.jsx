@@ -36,7 +36,7 @@ function ListaDeCarros({ carros, isLoading, error, updateCar, updateCallBack }) 
                             <Col key={index}>
                                 <Card style={{ width: '18rem' }}>
                                     <div style={{ height: '200px', overflow: 'hidden' }}>
-                                        <Card.Img variant="top" src={carro.foto || placeholderImage} alt="Foto do carro" style={{ width: '100%', objectFit: 'cover' }} />
+                                        <Card.Img variant="top" src={carro.foto || placeholderImage} onError={(e) => { e.target.src = placeholderImage }} alt="Foto do carro" style={{ width: '100%', objectFit: 'cover' }} />
                                     </div>
                                     <Card.Body>
                                         <Card.Title>{carro.marca} &#8226; {carro.modelo}</Card.Title>

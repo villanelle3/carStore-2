@@ -1,6 +1,7 @@
 import ListaDeCarros from './components/ListaDeCarros';
 import Formulario from './components/Formulario';
 import Modal from './components/Modal';
+import MainNav from './components/MainNav';
 import { useState, useEffect } from 'react';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -55,7 +56,8 @@ function App() {
 
   return (
     <div className="App">
-      <Button className='mb-5' onClick={openCreateModal} variant="success">Criar Novo</Button>
+      <MainNav/>
+      <Button className='mb-5 mt-5' onClick={openCreateModal} variant="success">Criar Novo</Button>
       <ListaDeCarros carros={carros} isLoading={isLoading} error={error} updateCar={openEditModal} updateCallBack={onUpdate} />
       <Modal isOpen={isModalOpen} onClose={closeModal}>
         <Formulario existingCar={currentCar} updateCallBack={onUpdate} />
