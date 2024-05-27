@@ -2,5 +2,6 @@ Flask
 Flask-SQLAlchemy
 flask-cors
 Flask-Uploads
+Flask-JWT-Extended
 werkzeug
 

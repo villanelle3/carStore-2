@@ -1,12 +1,61 @@
 from flask import Flask, request, jsonify, redirect, url_for, send_from_directory
 from werkzeug.utils import secure_filename
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from werkzeug.security import generate_password_hash, check_password_hash
 from config import app, db
-from models import Item
+from models import Item, User
 import os
 
-# Configurações para upload de arquivos
+# Configurações para upload de fotos
 app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Limite de 16MB para upload de arquivos permitidos
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Limite de 16MB
+
+
+# Rotas de autenticação
+@app.route('/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    if not data:
+        return jsonify({"message": "Dados ausentes"}), 400
+
+    username = data.get('username')
+    password = data.get('password')
+
+    if not username or not password:
+        return jsonify({"message": "Username e senha são obrigatórios"}), 400
+    if User.query.filter_by(username=username).first():
+        return jsonify({"message": "Este username já está em uso"}), 400
+    hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+    try:
+        new_user = User(username=username, password=hashed_password)
+        db.session.add(new_user)
+        db.session.commit()
+        return jsonify({"message": "Usuário registrado com sucesso!"}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": f"Erro ao registrar usuário: {str(e)}"}), 500
+
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    if not data or not data.get('username') or not data.get('password'):
+        return jsonify({"message": "Username e senha são obrigatórios"}), 400
+
+    user = User.query.filter_by(username=data['username']).first()
+    if not user or not check_password_hash(user.password, data['password']):
+        return jsonify({"message": "Credenciais inválidas!"}), 401
+    
+    access_token = create_access_token(identity={'username': user.username})
+    return jsonify(access_token=access_token), 200
+
+
+# Rota protegida
+@app.route('/protected', methods=['GET'])
+@jwt_required()
+def protected():
+    current_user = get_jwt_identity()
+    return jsonify(logged_in_as=current_user), 200
+
 
 @app.route("/carros", methods=["GET"])
 def get_carros():

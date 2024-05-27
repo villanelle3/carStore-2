@@ -1,20 +1,24 @@
-import Container from 'react-bootstrap/Container';
-import Nav from 'react-bootstrap/Nav';
-import Navbar from 'react-bootstrap/Navbar';
+// MainNav.jsx
+import { Container, Nav, Navbar } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 
-function MainNav() {
+function MainNav({ isLoggedIn, onLogout }) {
     return (
         <Navbar expand="lg" className="bg-body-tertiary" fixed="top" data-bs-theme="dark">
             <Container>
                 <Navbar.Brand href="/">Car Store</Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
-                <Nav className="me-auto">
-                    <Nav.Link href="/">Comprar carro</Nav.Link>
-                </Nav>
-                <Nav className="ms-auto">
-                    <Nav.Link href="#link" className="ml-auto">Login</Nav.Link> {/* Alterado para ml-auto */}
-                </Nav>
+                    <Nav className="me-auto">
+                        <Nav.Link as={Link} to="/">Comprar carro</Nav.Link>
+                    </Nav>
+                    <Nav className="ms-auto">
+                        {isLoggedIn ? (
+                            <Nav.Link onClick={onLogout}>Logout</Nav.Link>
+                        ) : (
+                            <Nav.Link as={Link} to="/login">Login</Nav.Link>
+                        )}
+                    </Nav>
                 </Navbar.Collapse>
             </Container>
         </Navbar>

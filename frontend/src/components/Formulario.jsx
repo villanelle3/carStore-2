@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -15,8 +15,27 @@ const Formulario = ({ existingCar = {}, updateCallBack }) => {
 
     // Função para limpar o valor de preço
     const limparPreco = (preco) => {
-        return parseFloat(preco.replace(/[^0-9,-]+/g, '').replace(',', '.'));
+        // Verificar se o preço não é uma string
+        if (typeof preco !== 'string') {
+            return preco;
+        }
+
+        // Remover caracteres não numéricos, exceto vírgulas e pontos
+        const precoLimpo = preco.replace(/[^0-9,.]+/g, '');
+
+        // Substituir vírgulas por pontos para garantir um formato de número válido
+        const precoNumerico = precoLimpo.replace(',', '.');
+
+        // Converter a string em um número de ponto flutuante
+        return parseFloat(precoNumerico);
     };
+
+    useEffect(() => {
+        // Limpar o valor do preço apenas quando estiver atualizando o formulário
+        if (updating) {
+            setPreco(limparPreco(preco));
+        }
+    }, [updating, preco]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -25,7 +44,7 @@ const Formulario = ({ existingCar = {}, updateCallBack }) => {
         formData.append('nome', nome);
         formData.append('marca', marca);
         formData.append('modelo', modelo);
-        formData.append('preco', limparPreco(preco)); // Use a função de limpeza
+        formData.append('preco', preco);
 
         if (foto) {
             formData.append('foto', foto);

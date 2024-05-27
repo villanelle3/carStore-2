@@ -5,7 +5,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import placeholderImage from './placeholder.png'; 
 
-function ListaDeCarros({ carros, isLoading, error, updateCar, updateCallBack }) {
+function ListaDeCarros({ isLoggedIn, carros, isLoading, error, updateCar, updateCallBack }) {
     const onDelete = async (id) => {
         try {
             const options = {
@@ -45,8 +45,14 @@ function ListaDeCarros({ carros, isLoading, error, updateCar, updateCallBack }) 
                                             <span>Preço à vista</span>
                                             <h5>R$ <span>{carro.preco.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></h5>
                                         </Card.Text>
-                                        <Button onClick={() => updateCar(carro)} variant="primary" className="mx-2">Update</Button>
-                                        <Button onClick={() => onDelete(carro.id)} variant="danger" className="mx-2">Delete</Button>
+                                        {isLoggedIn ? 
+                                            <>
+                                                <Button onClick={() => updateCar(carro)} variant="primary" className="mx-2">Update</Button>
+                                                <Button onClick={() => onDelete(carro.id)} variant="danger" className="mx-2">Delete</Button>
+                                            </>
+                                            :
+                                            <Button variant="success" onClick={() => alert("Entraremos em contato!")}>Comprar</Button>
+                                        }
                                     </Card.Body>
                                 </Card>
                             </Col>
