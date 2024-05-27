@@ -6,7 +6,7 @@ from config import app, db
 from models import Item, User
 import os
 
-# Configurações para upload de fotos
+
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Limite de 16MB
 
@@ -34,6 +34,7 @@ def register():
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": f"Erro ao registrar usuário: {str(e)}"}), 500
+
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -69,6 +70,7 @@ def get_carros():
 
 
 @app.route("/create_car", methods=["POST"])
+@jwt_required()
 def create_car():
     """
     Cria um novo carro com os dados fornecidos.
@@ -111,6 +113,7 @@ def create_car():
 
 
 @app.route("/update_info/<int:carro_id>", methods=["PATCH"])
+@jwt_required()
 def update_info(carro_id):
     """
     Atualiza as informações de um carro existente.
@@ -149,7 +152,9 @@ def update_info(carro_id):
         db.session.rollback()
         return jsonify({"message": str(e)}), 500
 
+
 @app.route("/delete_carro/<int:carro_id>", methods=["DELETE"])
+@jwt_required()
 def delete_carro(carro_id):
     """
     Deleta um carro existente.

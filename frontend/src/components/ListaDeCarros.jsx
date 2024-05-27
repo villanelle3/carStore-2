@@ -4,12 +4,16 @@ import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import placeholderImage from './placeholder.png'; 
+import useToken from './useToken';
+
 
 function ListaDeCarros({ isLoggedIn, carros, isLoading, error, updateCar, updateCallBack }) {
+    const { token } = useToken();
     const onDelete = async (id) => {
         try {
             const options = {
-                method: "DELETE"
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${token}` },
             };
             const response = await fetch(`http://127.0.0.1:5000/delete_carro/${id}`, options);
             if (response.status === 200) {
@@ -66,6 +70,7 @@ function ListaDeCarros({ isLoggedIn, carros, isLoading, error, updateCar, update
 ListaDeCarros.propTypes = {
     carros: PropTypes.array.isRequired,
     isLoading: PropTypes.bool.isRequired,
+    isLoggedIn: PropTypes.bool.isRequired,
     error: PropTypes.string,
     updateCar: PropTypes.func.isRequired,
     updateCallBack: PropTypes.func.isRequired

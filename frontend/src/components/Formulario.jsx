@@ -3,8 +3,10 @@ import PropTypes from 'prop-types';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { NumericFormat } from 'react-number-format';
+import useToken from './useToken';
 
 const Formulario = ({ existingCar = {}, updateCallBack }) => {
+    const { token } = useToken();
     const [nome, setNome] = useState(existingCar.nome || "");
     const [marca, setMarca] = useState(existingCar.marca || "");
     const [modelo, setModelo] = useState(existingCar.modelo || "");
@@ -13,25 +15,15 @@ const Formulario = ({ existingCar = {}, updateCallBack }) => {
 
     const updating = Object.entries(existingCar).length !== 0;
 
-    // Função para limpar o valor de preço
     const limparPreco = (preco) => {
-        // Verificar se o preço não é uma string
         if (typeof preco !== 'string') {
             return preco;
         }
-
-        // Remover caracteres não numéricos, exceto vírgulas e pontos
-        const precoLimpo = preco.replace(/[^0-9,.]+/g, '');
-
-        // Substituir vírgulas por pontos para garantir um formato de número válido
-        const precoNumerico = precoLimpo.replace(',', '.');
-
-        // Converter a string em um número de ponto flutuante
-        return parseFloat(precoNumerico);
+        const precoLimpo = preco.replace(/[^0-9,]+/g, '').replace(',', '.');
+        return parseFloat(precoLimpo);
     };
 
     useEffect(() => {
-        // Limpar o valor do preço apenas quando estiver atualizando o formulário
         if (updating) {
             setPreco(limparPreco(preco));
         }
@@ -40,11 +32,17 @@ const Formulario = ({ existingCar = {}, updateCallBack }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        const precoLimpo = limparPreco(preco);
+        if (isNaN(precoLimpo)) {
+            alert("Preço inválido");
+            return;
+        }
+
         const formData = new FormData();
         formData.append('nome', nome);
         formData.append('marca', marca);
         formData.append('modelo', modelo);
-        formData.append('preco', preco);
+        formData.append('preco', precoLimpo);
 
         if (foto) {
             formData.append('foto', foto);
@@ -53,6 +51,7 @@ const Formulario = ({ existingCar = {}, updateCallBack }) => {
         const url = "http://127.0.0.1:5000/" + (updating ? `update_info/${existingCar.id}` : "create_car");
         const options = {
             method: updating ? "PATCH" : "POST",
+            headers: { Authorization: `Bearer ${token}` },
             body: formData
         };
         const response = await fetch(url, options);

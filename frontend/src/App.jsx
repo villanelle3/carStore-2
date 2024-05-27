@@ -1,5 +1,4 @@
-// App.jsx
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import ListaDeCarros from './components/ListaDeCarros';
 import Formulario from './components/Formulario';

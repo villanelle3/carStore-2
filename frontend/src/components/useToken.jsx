@@ -1,4 +1,3 @@
-// useToken.jsx
 import { useState } from 'react';
 
 function useToken() {
