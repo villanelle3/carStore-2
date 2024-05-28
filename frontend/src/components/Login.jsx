@@ -22,6 +22,7 @@ const Login = ({ onLogin }) => {
             setToken(response.data.access_token);
             onLogin();
             navigate('/');
+            window.location.reload();
         } catch (error) {
             console.error('Erro no login:', error);
             setErro(true)

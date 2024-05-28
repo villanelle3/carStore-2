@@ -7,7 +7,7 @@ import placeholderImage from './placeholder.png';
 import useToken from './useToken';
 
 
-function ListaDeCarros({ isLoggedIn, carros, isLoading, error, updateCar, updateCallBack }) {
+function ListaDeCarros({ isLoggedIn, isAdmin, carros, isLoading, error, updateCar, updateCallBack }) {
     const { token } = useToken();
     const onDelete = async (id) => {
         try {
@@ -49,7 +49,7 @@ function ListaDeCarros({ isLoggedIn, carros, isLoading, error, updateCar, update
                                             <span>Preço à vista</span>
                                             <h5>R$ <span>{carro.preco.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></h5>
                                         </Card.Text>
-                                        {isLoggedIn ? 
+                                        {isLoggedIn && isAdmin ? 
                                             <>
                                                 <Button onClick={() => updateCar(carro)} variant="primary" className="mx-2">Update</Button>
                                                 <Button onClick={() => onDelete(carro.id)} variant="danger" className="mx-2">Delete</Button>

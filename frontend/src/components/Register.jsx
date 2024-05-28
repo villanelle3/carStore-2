@@ -6,11 +6,11 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Alert from 'react-bootstrap/Alert';
 
-
 const Register = ({ onRegister }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [isAdmin, setIsAdmin] = useState(false); // Estado para o checkbox
     const [redirect, setRedirect] = useState(false);
 
     const handleSubmit = async (e) => {
@@ -19,9 +19,13 @@ const Register = ({ onRegister }) => {
             alert('As senhas não coincidem');
             return;
         }
-        
+
         try {
-            const response = await axios.post('http://127.0.0.1:5000/register', { username, password });
+            const response = await axios.post('http://127.0.0.1:5000/register', { 
+                username, 
+                password, 
+                is_admin: isAdmin
+            });
             console.log(response);
             if (response.status === 201) {
                 setRedirect(true);
@@ -48,6 +52,14 @@ const Register = ({ onRegister }) => {
                     <Form.Group className="mb-3">
                         <Form.Label>Confirm Password:</Form.Label>
                         <Form.Control type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                        <Form.Check 
+                            type="checkbox" 
+                            label="Registrar como admin" 
+                            checked={isAdmin} 
+                            onChange={(e) => setIsAdmin(e.target.checked)}
+                        />
                     </Form.Group>
                     <Button type="submit">Register</Button>
                 </Form>

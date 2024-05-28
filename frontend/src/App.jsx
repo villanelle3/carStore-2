@@ -17,7 +17,7 @@ function App() {
   const [carros, setCarros] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { token, setToken, removeToken } = useToken();
+  const { token, setToken, removeToken, isAdmin } = useToken();
   const [isLoggedIn, setIsLoggedIn] = useState(!!token);
   const navigate = useNavigate();
 
@@ -76,13 +76,16 @@ function App() {
           path="/"
           element={
             <>
-              {isLoggedIn ? (
-                <Button className="mb-5 mt-5" onClick={openCreateModal} variant="success">
-                  Criar Novo
-                </Button>
+              {isLoggedIn && isAdmin() ? (
+                <>
+                  <Button className="mb-5 mt-5" onClick={openCreateModal} variant="success">
+                    Criar Novo
+                  </Button>
+                </>
               ) : <div className='mb-5'></div>}
               <ListaDeCarros
                 isLoggedIn={isLoggedIn}
+                isAdmin={isAdmin()}
                 carros={carros}
                 isLoading={isLoading}
                 error={error}

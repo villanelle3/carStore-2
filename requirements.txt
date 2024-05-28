@@ -3,5 +3,6 @@ Flask-SQLAlchemy
 flask-cors
 Flask-Uploads
 Flask-JWT-Extended
+flask-migrate
 werkzeug
 

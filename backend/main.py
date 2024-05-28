@@ -3,12 +3,18 @@ from werkzeug.utils import secure_filename
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from werkzeug.security import generate_password_hash, check_password_hash
 from config import app, db
-from models import Item, User
+from models import Item, User, UserPermissions
 import os
 
 
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Limite de 16MB
+
+
+# Função que verifica se o usuário é admin
+def is_admin(user_id):
+    user_permission = UserPermissions.query.filter_by(user_id=user_id).first()
+    return user_permission.is_admin if user_permission else False
 
 
 # Rotas de autenticação
@@ -20,6 +26,7 @@ def register():
 
     username = data.get('username')
     password = data.get('password')
+    is_admin_flag = data.get('is_admin', False)
 
     if not username or not password:
         return jsonify({"message": "Username e senha são obrigatórios"}), 400
@@ -30,6 +37,11 @@ def register():
         new_user = User(username=username, password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
+
+        user_permission = UserPermissions(user_id=new_user.id, is_admin=is_admin_flag)
+        db.session.add(user_permission)
+        db.session.commit()
+
         return jsonify({"message": "Usuário registrado com sucesso!"}), 201
     except Exception as e:
         db.session.rollback()
@@ -45,8 +57,11 @@ def login():
     user = User.query.filter_by(username=data['username']).first()
     if not user or not check_password_hash(user.password, data['password']):
         return jsonify({"message": "Credenciais inválidas!"}), 401
-    
-    access_token = create_access_token(identity={'username': user.username})
+
+    user_permissions = UserPermissions.query.filter_by(user_id=user.id).first()
+    is_admin = user_permissions.is_admin if user_permissions else False
+    print(f"é adm? {is_admin}")
+    access_token = create_access_token(identity={'username': user.username, 'is_admin': is_admin})
     return jsonify(access_token=access_token), 200
 
 

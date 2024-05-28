@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { jwtDecode } from "jwt-decode";
 
 function useToken() {
     const getToken = () => {
@@ -18,10 +19,28 @@ function useToken() {
         setToken(null);
     };
 
+    const isAdmin = () => {
+        if (token) {
+            try {
+                const decoded = jwtDecode(token);
+                return decoded.sub.is_admin || false;
+            } catch (e) {
+                console.error("Error decoding token:", e);
+                return false;
+            }
+        }
+        return false;
+    };
+
+    useEffect(() => {
+        setToken(getToken());
+    }, []);
+
     return {
         setToken: saveToken,
         token,
-        removeToken
+        removeToken,
+        isAdmin
     };
 }
 
