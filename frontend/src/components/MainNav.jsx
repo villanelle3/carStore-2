@@ -1,8 +1,7 @@
-// MainNav.jsx
 import { Container, Nav, Navbar } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
-function MainNav({ isLoggedIn, onLogout }) {
+function MainNav({ user, isLoggedIn, onLogout }) {
     return (
         <Navbar expand="lg" className="bg-body-tertiary" fixed="top" data-bs-theme="dark">
             <Container>
@@ -14,7 +13,12 @@ function MainNav({ isLoggedIn, onLogout }) {
                     </Nav>
                     <Nav className="ms-auto">
                         {isLoggedIn ? (
-                            <Nav.Link onClick={onLogout}>Logout</Nav.Link>
+                            <>
+                                <Navbar.Text>
+                                    Logado como: {user}
+                                </Navbar.Text>
+                                <Nav.Link onClick={onLogout}>Logout</Nav.Link>
+                            </>
                         ) : (
                             <Nav.Link as={Link} to="/login">Login</Nav.Link>
                         )}

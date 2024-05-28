@@ -32,6 +32,19 @@ function useToken() {
         return false;
     };
 
+    const getUsername = () => {
+        if (token) {
+            try {
+                const decoded = jwtDecode(token);
+                return decoded.sub.username || '';
+            } catch (e) {
+                console.error("Error decoding token:", e);
+                return '';
+            }
+        }
+        return '';
+    };
+
     useEffect(() => {
         setToken(getToken());
     }, []);
@@ -40,7 +53,8 @@ function useToken() {
         setToken: saveToken,
         token,
         removeToken,
-        isAdmin
+        isAdmin,
+        getUsername
     };
 }
 

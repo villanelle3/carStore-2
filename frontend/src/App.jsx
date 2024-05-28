@@ -17,7 +17,8 @@ function App() {
   const [carros, setCarros] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { token, setToken, removeToken, isAdmin } = useToken();
+  const { token, setToken, removeToken, isAdmin, getUsername } = useToken();
+  console.log(`username logado ${getUsername()}`)
   const [isLoggedIn, setIsLoggedIn] = useState(!!token);
   const navigate = useNavigate();
 
@@ -68,7 +69,7 @@ function App() {
 
   return (
     <div className="App">
-      <MainNav isLoggedIn={isLoggedIn} onLogout={handleLogout} />
+      <MainNav user={getUsername()} isLoggedIn={isLoggedIn} onLogout={handleLogout} />
       <Routes>
         <Route path="/login" element={<Login onLogin={() => setIsLoggedIn(true)} />} />
         <Route path="/register" element={<Register />} />
