@@ -17,7 +17,7 @@ Catálogo de veículos à venda, que utiliza uma API desenvolvida em Flask para 
 
 - Catálogo de veículos à venda ordenados por valor.
 - Login e registro de usuários.
-- Login de administrador para cadastro, edição e deleção de veículos (Cadatre-se como administrador para testar)
+- Login de administrador para cadastro, edição e deleção de veículos (Cadastre-se como administrador para testar)
 - Token JWT
 - Interface amigável para gerenciamento de veículos.
 
